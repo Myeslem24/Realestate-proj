@@ -1,0 +1,103 @@
+{% load static %}
+{% load tz %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>من نحن - منصتنا العقارية</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+    }
+
+    .hero {
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+                  url("/media/cover1.jpeg") center/cover no-repeat;
+      color: white;
+      text-align: center;
+      padding: 120px 20px;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .content {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .content h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .content p {
+      font-size: 18px;
+      line-height: 1.8;
+      color: #555;
+      text-align: center;
+    }
+
+    .contact {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .contact a {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 25px;
+      background-color: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .contact a.call {
+      background-color: #007bff;
+    }
+
+    .contact a:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <a href="{% url 'home' %}" class="btn btn-secondary mb-4">🏠 العودة للصفحة الرئيسية</a>
+    <h1>من نحن</h1>
+    <p>نحن منصتك العقارية الموثوقة التي تجمع بين الابتكار، الاحترافية، والسهولة لتجربة عقارية فريدة.</p>
+  </div>
+
+  <div class="content">
+    <h2>رسالتنا</h2>
+    <p>
+      نؤمن بأن شراء أو بيع العقارات يجب أن يكون سهلاً، شفافًا، وآمنًا. نسعى لربط المشترين والبائعين من خلال منصة ذكية وسهلة الاستخدام، تدعم الصور، الخرائط، والمراسلة الفورية.
+    </p>
+
+    <div class="contact">
+      <h2>تواصل معنا مباشرة</h2>
+      <a href="https://wa.me/22237054547" target="_blank">💬 واتساب</a>
+      <a href="tel:+22238388780" class="call">📞 اتصال</a>
+    </div>
+  </div>
+
+</body>
+</html>
+

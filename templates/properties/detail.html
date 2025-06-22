@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ property.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .property-img, .property-video {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .btn-whatsapp {
+      background-color: #25D366;
+      color: white;
+    }
+
+    .btn-whatsapp:hover {
+      background-color: #1ebe5d;
+    }
+
+    .btn-call {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-call:hover {
+      background-color: #0056b3;
+    }
+
+    #map {
+      height: 350px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .card h2 {
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .media-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .media-container > div {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container py-4">
+  <a href="{% url 'home' %}" class="btn btn-secondary mb-4">🏠 العودة للصفحة الرئيسية</a>
+
+  <div class="card shadow-sm p-4">
+    <h2 class="text-primary">{{ property.title }}</h2>
+
+    <p><strong>الوصف:</strong> {{ property.description }}</p>
+    <p>🏷️ <strong>النوع:</strong> {{ property.get_type_display }} | 🎯 <strong>الغرض:</strong> {{ property.get_purpose_display }}</p>
+    <p>📍 <strong>المدينة:</strong> {{ property.main_location }}</p>
+    {% if property.district %}
+      <p>🏘️ <strong>المقاطعة:</strong> {{ property.district }}</p>
+    {% endif %}
+    <p>💰 <strong>السعر:</strong> {{ property.price }}$</p>
+    <p>📞 <strong>للتواصل:</strong> {{ property.admin_phone }}</p>
+
+    {% if property.is_sold %}
+      <span class="badge bg-danger">🔴 تم البيع</span>
+    {% endif %}
+
+    <div class="mb-4 mt-3">
+      <a href="https://wa.me/{{ property.admin_phone|cut:'+' }}" target="_blank" class="btn btn-whatsapp me-2">💬 تواصل عبر WhatsApp</a>
+      <a href="tel:{{ property.admin_phone }}" class="btn btn-call">📞 اتصال مباشر</a>
+    </div>
+
+    {% if property.media.all %}
+  <div class="media-container row mt-4">
+    {% for media in property.media.all %}
+      <div class="col-md-4 col-sm-6 col-12 mb-3">
+        <div class="card shadow-sm">
+          {% if media.image %}
+            <img src="{{ media.image.url }}" class="card-img-top img-fluid rounded" alt="صورة العقار" style="max-height: 250px; object-fit: cover;">
+          {% endif %}
+          {% if media.video %}
+            <video class="w-100 rounded" controls style="max-height: 250px; object-fit: cover;">
+              <source src="{{ media.video.url }}" type="video/mp4">
+              متصفحك لا يدعم تشغيل الفيديو.
+            </video>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+    <h5 class="mt-4">📍 موقع العقار على الخريطة:</h5>
+    <div id="map">جاري تحميل الخريطة...</div>
+  </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const lat = {{ property.latitude|default:"0" }};
+  const lng = {{ property.longitude|default:"0" }};
+
+  if (lat !== 0 && lng !== 0) {
+    const map = L.map('map').setView([lat, lng], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.marker([lat, lng]).addTo(map)
+      .bindPopup('📍 موقع العقار')
+      .openPopup();
+  } else {
+    document.getElementById('map').innerHTML = "📍 لم يتم تحديد موقع هذا العقار.";
+  }
+</script>
+
+</body>
+</html>
+

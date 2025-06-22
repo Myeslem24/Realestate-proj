@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>منصة العقارات</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <style>
+    .hero-section {
+      background: url("/media/cover1.jpeg") no-repeat center center;
+      background-size: cover;
+      color: white;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+    .overlay {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 60px 0;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand" href="#"> بوابة العقارات</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link active" href="#">الرئيسية</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'property_list' %}">العقارات</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'we_are' %}">من نحن</a></li> <!-- تمت إضافتها هنا -->
+        {% if user.is_authenticated %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">لوحة التحكم</a></li>
+        <li class="nav-item">
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="nav-link btn btn-link text-white border-0" type="submit" style="text-decoration: none;">تسجيل الخروج</button>
+          </form>
+        </li>
+        {% else %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">تسجيل الدخول</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section with Background -->
+<header class="hero-section text-center">
+  <div class="overlay">
+    <div class="container">
+      <h1 class="display-4">شقق، منازل، وأراضٍ للبيع والإيجار</h1>
+      <p class="lead">احجز عقارك اليوم – الأفضل في البيع والتأجير بين يديك</p>
+      <p class="lead">عندك عقار للبيع أو الإيجار؟ تواصل معنا الآن ودعنا نهتم بالباقي</p>
+      <a href="{% url 'add_property' %}" class="btn btn-light btn-lg mt-3">إضافة عقار جديد</a>
+    </div>
+  </div>
+</header>
+
+<!-- Property Section -->
+<!-- قسم تصفية العقارات -->
+<section class="container py-4">
+  <form method="get" class="row g-3 align-items-end">
+    <div class="col-md-4">
+      <label for="city" class="form-label">المدينة</label>
+      <select class="form-select" name="city" id="city" onchange="this.form.submit()">
+        <option value="">اختر المدينة</option>
+        {% for value, label in cities %}
+          <option value="{{ value }}" {% if value == selected_city %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {% if selected_city == "نواكشوط" %}
+    <div class="col-md-4">
+      <label for="district" class="form-label">الحي</label>
+      <select class="form-select" name="district" id="district" onchange="this.form.submit()">
+        <option value="">اختر الحي</option>
+        {% for value, label in districts %}
+          <option value="{{ value }}" {% if value == selected_district %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    <div class="col-md-4">
+      <button type="submit" class="btn btn-primary">بحث</button>
+      <a href="{% url 'home' %}" class="btn btn-secondary ms-2">إعادة تعيين</a>
+    </div>
+  </form>
+</section>
+
+<section class="container py-5">
+  <h2 class="mb-4 text-center">عقارات مميزة</h2>
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for property in properties %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ property.title }}</h5>
+          <p class="card-text">{{ property.description|truncatechars:100 }}</p>
+          <p class="card-text"><small>📍 {{ property.location }} | 💰 {{ property.price }} MRU</small></p>
+          <a href="{% url 'property_detail' property.pk %}" class="btn btn-outline-primary btn-sm">التفاصيل</a>
+        </div>
+   {% if property.is_sold %}
+      <span class="badge bg-danger">🔴 تم البيع</span>
+    {% endif %}
+
+        <!-- صور العقار -->
+        <div class="card-footer bg-white border-0">
+          <div class="row">
+            {% for media in property.media.all %}
+              {% if media.image %}
+                <div class="col-6 col-md-4 mb-2">
+                  <img src="{{ media.image.url }}"
+                       class="img-fluid rounded shadow-sm"
+                       style="max-height: 200px; object-fit: cover; width: 100%;"
+                       alt="صورة العقار">
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-primary text-white text-center py-3 mt-5">
+  <p class="mb-0">&copy; {{ year }} منصة العقارات. جميع الحقوق محفوظة.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

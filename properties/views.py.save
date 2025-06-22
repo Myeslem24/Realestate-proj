@@ -1,0 +1,86 @@
+# properties/views.py
+from django.shortcuts import render, redirect
+from .models import Property, PropertyMedia
+from .forms import PropertyForm, PropertyMediaFormSet
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render
+from datetime import datetime
+
+def home_view(request):
+    properties = Property.objects.filter(is_approved=True)[:4]  # نعرض فقط بعض العقارات المميزة
+    context = {
+        'properties': properties,
+        'year': datetime.now().year
+    }
+    return render(request, 'home.html', context)
+
+# عرض العقارات المعتمدة فقط
+def property_list(request):
+    properties = Property.objects.filter(status='approved')
+    admin_phone = '0777-777-777'  # رقم الأدمن الثابت
+    return render(request, 'properties/property_list.html', {
+        'properties': properties,
+        'admin_phone': admin_phone,
+    })
+
+# إضافة عقار من قبل المستخدم
+@login_required
+def add_property(request):
+    if request.method == 'POST':
+        form = PropertyForm(request.POST)
+        media_formset = PropertyMediaFormSet(request.POST, request.FILES)
+        if form.is_valid() and media_formset.is_valid():
+            property = form.save(commit=False)
+            property.owner = request.user
+            property.status = 'pending'
+            property.save()
+
+            for media_form in media_formset:
+                if media_form.cleaned_data:
+                    media = media_form.save(commit=False)
+                    media.property = property
+                    media.save()
+
+            messages.success(request, 'تم إرسال العقار للمراجعة.')
+            return redirect('property_list')
+    else:
+        form = PropertyForm()
+        media_formset = PropertyMediaFormSet()
+        return render(request, 'properties/add_property.html', {
+            'form': form,
+            'media_formset': media_formset,
+        })
+
+@staff_member_required
+def review_properties(request):
+    pending_properties = Property.objects.filter(status='pending')
+    return render(request, 'admin/review_properties.html', {'properties': pending_properties})
+
+
+@staff_member_required
+def approve_property(request, pk):
+    property = get_object_or_404(Property, pk=pk)
+    property.status = 'approved'
+    property.save()
+    messages.success(request, 'تم قبول العقار بنجاح.')
+    return redirect('review_properties')
+
+
+@staff_member_required
+def reject_property(request, pk):
+    property = get_object_or_404(Property, pk=pk)
+    property.status = 'rejected'
+    property.save()
+    messages.error(request, 'تم رفض العقار.')
+    return redirect('review_properties')
+@login_required
+def dashboard(request):
+    my_properties = Property.objects.filter(owner=request.user)
+    return render(request, 'dashboard.html', {'properties': my_properties})
+def home_view(request):
+    properties = Property.objects.filter(status='approved').order_by('-created_at')
+    admin_phone = "123456789"
+    return render(request, 'properties/property_list.html', {'properties': properties, 'admin_phone': admin_phone})
