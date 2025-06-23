@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-kx-r5zux4oe=sy^lwa+)9!4z_59t@g8=jvxuz24!hfd5@fotid'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['realestate-proj.onrender.com', 'localhost', '127.0.0.1']
 
 
