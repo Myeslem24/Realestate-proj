@@ -30,8 +30,8 @@ ALLOWED_HOSTS = os.environ.get(
     "ALLOWED_HOSTS",
     "realestate-proj.onrender.com,127.0.0.1,localhost"
 ).split(",")
-print("DEBUG:", DEBUG)
-print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
+print(f"DEBUG: {DEBUG}")
+print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 # Application definition
 
 INSTALLED_APPS = [
