@@ -24,8 +24,7 @@ SECRET_KEY = 'django-insecure-kx-r5zux4oe=sy^lwa+)9!4z_59t@g8=jvxuz24!hfd5@fotid
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-
-ALLOWED_HOSTS = ['https://realestate-proj.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['realestate-proj.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -50,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # مباشرة بعد SecurityMiddleware
 ]
 
 ROOT_URLCONF = 'realestate.urls'
