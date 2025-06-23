@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: realestate-proj
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn realestate.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: "False"
+    staticPublishPath: media
