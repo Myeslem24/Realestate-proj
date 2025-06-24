@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>منصة العقارات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <style>
     .hero-section {
@@ -15,6 +16,18 @@
       background: rgba(0, 0, 0, 0.5);
       padding: 60px 0;
     }
+    @media (max-width: 767px) {
+      .overlay {
+        padding: 30px 10px;
+        text-align: center;
+      }
+      h1.display-4 {
+        font-size: 1.5rem;
+      }
+      .lead {
+        font-size: 1rem;
+      }
+    }
   </style>
 </head>
 <body class="bg-light">
@@ -22,7 +35,7 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container">
-    <a class="navbar-brand" href="#"> بوابة العقارات</a>
+    <a class="navbar-brand" href="#">بوابة العقارات</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -30,7 +43,7 @@
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link active" href="#">الرئيسية</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'property_list' %}">العقارات</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'we_are' %}">من نحن</a></li> <!-- تمت إضافتها هنا -->
+        <li class="nav-item"><a class="nav-link" href="{% url 'we_are' %}">من نحن</a></li>
         {% if user.is_authenticated %}
         <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">لوحة التحكم</a></li>
         <li class="nav-item">
@@ -47,7 +60,7 @@
   </div>
 </nav>
 
-<!-- Hero Section with Background -->
+<!-- Hero Section -->
 <header class="hero-section text-center">
   <div class="overlay">
     <div class="container">
@@ -59,42 +72,42 @@
   </div>
 </header>
 
-<!-- Property Section -->
-<!-- قسم تصفية العقارات -->
+<!-- Filter Section -->
 <section class="container py-4">
   <form method="get" class="row g-3 align-items-end">
-    <div class="col-md-4">
+    <div class="col-md-4 col-12">
       <label for="city" class="form-label">المدينة</label>
       <select class="form-select" name="city" id="city" onchange="this.form.submit()">
         <option value="">اختر المدينة</option>
         {% for value, label in cities %}
-          <option value="{{ value }}" {% if value == selected_city %}selected{% endif %}>{{ label }}</option>
+        <option value="{{ value }}" {% if value == selected_city %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
       </select>
     </div>
 
     {% if selected_city == "نواكشوط" %}
-    <div class="col-md-4">
+    <div class="col-md-4 col-12">
       <label for="district" class="form-label">الحي</label>
       <select class="form-select" name="district" id="district" onchange="this.form.submit()">
         <option value="">اختر الحي</option>
         {% for value, label in districts %}
-          <option value="{{ value }}" {% if value == selected_district %}selected{% endif %}>{{ label }}</option>
+        <option value="{{ value }}" {% if value == selected_district %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
       </select>
     </div>
     {% endif %}
 
-    <div class="col-md-4">
+    <div class="col-md-4 col-12">
       <button type="submit" class="btn btn-primary">بحث</button>
       <a href="{% url 'home' %}" class="btn btn-secondary ms-2">إعادة تعيين</a>
     </div>
   </form>
 </section>
 
+<!-- Featured Properties -->
 <section class="container py-5">
   <h2 class="mb-4 text-center">عقارات مميزة</h2>
-  <div class="row row-cols-1 row-cols-md-2 g-4">
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     {% for property in properties %}
     <div class="col">
       <div class="card h-100 shadow-sm">
@@ -104,22 +117,20 @@
           <p class="card-text"><small>📍 {{ property.location }} | 💰 {{ property.price }} MRU</small></p>
           <a href="{% url 'property_detail' property.pk %}" class="btn btn-outline-primary btn-sm">التفاصيل</a>
         </div>
-   {% if property.is_sold %}
-      <span class="badge bg-danger">🔴 تم البيع</span>
-    {% endif %}
-
-        <!-- صور العقار -->
+        {% if property.is_sold %}
+        <span class="badge bg-danger ms-3 mb-2">🔴 تم البيع</span>
+        {% endif %}
         <div class="card-footer bg-white border-0">
           <div class="row">
             {% for media in property.media.all %}
-              {% if media.image %}
-                <div class="col-6 col-md-4 mb-2">
-                  <img src="{{ media.image.url }}"
-                       class="img-fluid rounded shadow-sm"
-                       style="max-height: 200px; object-fit: cover; width: 100%;"
-                       alt="صورة العقار">
-                </div>
-              {% endif %}
+            {% if media.image %}
+            <div class="col-6 col-md-4 mb-2">
+              <img src="{{ media.image.url }}"
+                   class="img-fluid rounded shadow-sm"
+                   style="max-height: 200px; object-fit: cover; width: 100%;"
+                   alt="صورة العقار">
+            </div>
+            {% endif %}
             {% endfor %}
           </div>
         </div>
@@ -137,3 +148,4 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

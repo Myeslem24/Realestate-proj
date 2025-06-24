@@ -2,15 +2,19 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<!-- Lightbox CSS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>العقارات المعروضة</title>
+
+  <!-- Bootstrap & Lightbox CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+
   <style>
     body {
       background-color: #f1f3f5;
     }
+
     .property-card {
       background: #fff;
       border-radius: 10px;
@@ -18,33 +22,45 @@
       margin-bottom: 20px;
       padding: 20px;
     }
-    .property-img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 5px;
-      margin-bottom: 10px;
-    }
-    .property-video {
+
+    .property-img, .property-video {
       width: 100%;
+      height: 180px;
+      object-fit: cover;
       border-radius: 5px;
-      margin-top: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 576px) {
+      .property-card h4 {
+        font-size: 1.1rem;
+      }
+
+      .btn {
+        font-size: 0.9rem;
+      }
+
+      .property-img, .property-video {
+        height: 140px;
+      }
     }
   </style>
 </head>
 <body>
+
 <div class="container my-5">
-    <a href="{% url 'home' %}" class="btn btn-secondary mb-4">🏠 العودة للصفحة الرئيسية</a>
+  <a href="{% url 'home' %}" class="btn btn-secondary mb-4">🏠 العودة للصفحة الرئيسية</a>
   <h2 class="mb-4 text-center">🏠 العقارات المعروضة</h2>
 
-  <!-- ✅ نموذج التصفية -->
-  <form method="get" class="row mb-4">
-    <div class="col-md-5">
-    <input type="text" name="region" class="form-control" placeholder="🔍 ابحث حسب المنطقة" value="{{ selected_region }}">
+  <!-- نموذج التصفية -->
+  <form method="get" class="row mb-4 g-2">
+    <div class="col-12 col-md-5">
+      <input type="text" name="region" class="form-control" placeholder="🔍 ابحث حسب المنطقة" value="{{ selected_region }}">
     </div>
-    <div class="col-md-5">
+    <div class="col-12 col-md-5">
       <input type="text" name="neighborhood" class="form-control" placeholder="🔍 ابحث حسب الحي" value="{{ selected_neighborhood }}">
     </div>
-    <div class="col-md-2">
+    <div class="col-12 col-md-2">
       <button type="submit" class="btn btn-primary w-100">تصفية</button>
     </div>
   </form>
@@ -55,41 +71,37 @@
       <p><strong>الوصف:</strong> {{ property.description }}</p>
       <p>🏷️ <strong>النوع:</strong> {{ property.get_type_display }} | 🎯 <strong>الغرض:</strong> {{ property.get_purpose_display }}</p>
       <p>📍 <strong>الموقع:</strong> {{ property.location }}</p>
-      <p>💰 <strong>السعر:</strong> {{ property.price }}$</p>
+      <p>💰 <strong>السعر:</strong> {{ property.price }} MRU</p>
       <p>📞 <strong>للتواصل:</strong> {{ admin_phone }}</p>
       {% if property.is_sold %}
         <span class="badge bg-danger">🔴 تم البيع</span>
       {% endif %}
 
-      <!-- ✅ عرض الوسائط داخل نفس بطاقة العقار -->
+      <!-- عرض الوسائط -->
       <div class="row mt-3">
-  {% for media in property.media.all %}
-    <div class="col-6 col-md-4 mb-3">
-      {% if media.image %}
-        <img src="{{ media.image.url }}" alt="صورة العقار"
-             class="img-fluid rounded shadow-sm"
-             style="height: 180px; width: 100%; object-fit: cover;">
-      {% endif %}
-      {% if media.video %}
-        <video controls class="w-100 rounded shadow-sm"
-               style="height: 180px; object-fit: cover;">
-          <source src="{{ media.video.url }}" type="video/mp4">
-          متصفحك لا يدعم تشغيل الفيديو.
-        </video>
-      {% endif %}
+        {% for media in property.media.all %}
+          <div class="col-6 col-md-4 mb-3">
+            {% if media.image %}
+              <a href="{{ media.image.url }}" data-lightbox="property-{{ property.id }}">
+                <img src="{{ media.image.url }}" alt="صورة العقار" class="property-img">
+              </a>
+            {% endif %}
+            {% if media.video %}
+              <video controls class="property-video mt-2">
+                <source src="{{ media.video.url }}" type="video/mp4">
+                متصفحك لا يدعم تشغيل الفيديو.
+              </video>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
     </div>
   {% endfor %}
-</div>
-
-
-    </div> <!-- نهاية بطاقة العقار -->
-  {% endfor %}
 
 </div>
 
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Lightbox JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 </body>
 </html>
-
