@@ -72,7 +72,7 @@
   </div>
 </header>
 
-<!-- Filter Section -->
+<!-- قسم الفلترة -->
 <section class="container py-4">
   <form method="get" class="row g-3 align-items-end">
     <div class="col-md-4 col-12">
@@ -80,7 +80,7 @@
       <select class="form-select" name="city" id="city" onchange="this.form.submit()">
         <option value="">اختر المدينة</option>
         {% for value, label in cities %}
-        <option value="{{ value }}" {% if value == selected_city %}selected{% endif %}>{{ label }}</option>
+          <option value="{{ value }}" {% if value == selected_city %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
       </select>
     </div>
@@ -91,11 +91,21 @@
       <select class="form-select" name="district" id="district" onchange="this.form.submit()">
         <option value="">اختر الحي</option>
         {% for value, label in districts %}
-        <option value="{{ value }}" {% if value == selected_district %}selected{% endif %}>{{ label }}</option>
+          <option value="{{ value }}" {% if value == selected_district %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
       </select>
     </div>
     {% endif %}
+
+    <div class="col-md-4 col-12">
+      <label for="purpose" class="form-label">الغرض</label>
+      <select class="form-select" name="purpose" id="purpose" onchange="this.form.submit()">
+        <option value="">اختر الغرض</option>
+        {% for value, label in purposes %}
+          <option value="{{ value }}" {% if value == selected_purpose %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
 
     <div class="col-md-4 col-12">
       <button type="submit" class="btn btn-primary">بحث</button>

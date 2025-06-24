@@ -16,6 +16,7 @@ from django.contrib.auth import login
 def home_view(request):
     city = request.GET.get('city')
     district = request.GET.get('district')
+    purpose = request.GET.get('purpose')  # ✅ جديد
 
     properties = Property.objects.filter(status='approved')
 
@@ -23,17 +24,20 @@ def home_view(request):
         properties = properties.filter(main_location=city)
     if district and city == 'نواكشوط':
         properties = properties.filter(district=district)
-
+    if purpose:
+        properties = properties.filter(purpose=purpose)  # ✅ جديد
     # عرض فقط 4 عقارات
     properties = properties[:4]
 
     context = {
         'properties': properties,
+        'selected_purpose': purpose,  # ✅ جديد
         'year': datetime.now().year,
         'selected_city': city,
         'selected_district': district,
         'cities': Property.MAIN_LOCATIONS,
         'districts': Property.NAWAKCHOTT_DISTRICTS if city == 'نواكشوط' else [],
+        'purposes': Property.PURPOSE_CHOICES,
     }
     return render(request, 'home.html', context)
 # عرض العقارات مع خاصية التصفية حسب المنطقة والحي
