@@ -7,21 +7,17 @@
   <title>إضافة عقار</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <style>
-    body {
-      background-color: #f8f9fa;
-    }
+    body { background-color: #f8f9fa; }
     .form-section {
       background: white;
       padding: 25px;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
-    h2, h4 {
-      font-weight: bold;
-    }
+    h2, h4 { font-weight: bold; }
     @media (max-width: 576px) {
-      .btn {
-        width: 100%;
+      .btn, input, select, textarea {
+        width: 100% !important;
       }
     }
   </style>
@@ -40,29 +36,16 @@
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
 
+      <!-- 🏡 معلومات العقار -->
       <h4 class="mb-3">📋 معلومات العقار</h4>
       <div class="row">
         <div class="col-12">
           {{ form.non_field_errors }}
         </div>
+
+        {# الحقول النصية والاختيارات باستثناء main_image و video #}
         {% for field in form %}
-          <div class="col-md-6 mb-3">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}
-              <div class="text-danger small">{{ field.errors|striptags }}</div>
-            {% endif %}
-          </div>
-        {% endfor %}
-      </div>
-
-      <hr class="my-4">
-
-      <h4 class="mb-3">🖼️ صور وفيديوهات العقار</h4>
-      {{ media_formset.management_form }}
-      <div class="row">
-        {% for media_form in media_formset %}
-          {% for field in media_form %}
+          {% if field.name != 'main_image' and field.name != 'video' %}
             <div class="col-md-6 mb-3">
               <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
               {{ field }}
@@ -70,12 +53,55 @@
                 <div class="text-danger small">{{ field.errors|striptags }}</div>
               {% endif %}
             </div>
-          {% endfor %}
+          {% endif %}
         {% endfor %}
       </div>
 
-      <div class="text-end mt-4">
-        <button type="submit" class="btn btn-primary px-4">📤 إرسال</button>
+      <!-- 📷 صورة الغلاف والفيديو -->
+      <hr class="my-4">
+      <h4 class="mb-3">📸 الصورة الرئيسية والفيديو</h4>
+      <p class="text-muted mb-4">📌 يمكنك رفع صورة رئيسية وفيديو قصير للعقار.</p>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.main_image.id_for_label }}" class="form-label">{{ form.main_image.label }}</label>
+          {{ form.main_image }}
+          {% if form.main_image.errors %}
+            <div class="text-danger small">{{ form.main_image.errors|striptags }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.video.id_for_label }}" class="form-label">{{ form.video.label }}</label>
+          {{ form.video }}
+          {% if form.video.errors %}
+            <div class="text-danger small">{{ form.video.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- 🖼️ صور إضافية -->
+      <hr class="my-4">
+      <h4 class="mb-3">🖼️ صور إضافية</h4>
+      <p class="text-muted mb-4">📌 يمكنك رفع حتى 3 صور إضافية.</p>
+
+      {{ media_formset.management_form }}
+      <div class="row">
+        {% for media_form in media_formset %}
+          <div class="col-md-6 mb-3">
+            {% for field in media_form %}
+              <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="text-danger small">{{ field.errors|striptags }}</div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- زر الحفظ -->
+      <hr class="my-4">
+      <div class="text-end">
+        <button type="submit" class="btn btn-primary btn-lg">💾 حفظ العقار</button>
       </div>
     </form>
   </div>
@@ -84,4 +110,3 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

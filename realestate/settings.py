@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'properties',
     'widget_tweaks',
-
+    'vehicles',  # ✅ أضفه هنا
 ]
 
 MIDDLEWARE = [

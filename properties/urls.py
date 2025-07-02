@@ -10,7 +10,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('edit/<int:property_id>/', views.edit_property, name='edit_property'),  # ✅ مضاف حديثاً
     path('delete/<int:property_id>/', views.delete_property, name='delete_property'),
-    path('admin/review/', views.review_properties, name='review_properties'),
+    path('admin/review-properties/', views.review_properties, name='review_properties'),
     path('admin/approve/<int:pk>/', views.approve_property, name='approve_property'),
     path('admin/reject/<int:pk>/', views.reject_property, name='reject_property'),
     path('accounts/register/', register_view, name='register'),
@@ -20,5 +20,6 @@ urlpatterns = [
     ), name='login'),
     path('<int:pk>/', views.property_detail, name='property_detail'),
     path('we-are/', we_are_view, name='we_are'),
+    path('ajax/get-districts/', views.get_districts, name='get_districts'),
 ]
 

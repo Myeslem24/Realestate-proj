@@ -3,7 +3,6 @@ from django.forms import modelformset_factory
 from .models import Property, PropertyMedia, CustomUser
 from django.contrib.auth.forms import UserCreationForm
 
-# الخيارات الثابتة للمواقع والمقاطعات (يمكن نقلها لاحقًا للـ models)
 MAIN_LOCATIONS = [
     ('نواكشوط', 'نواكشوط'),
     ('نواذيبو', 'نواذيبو'),
@@ -37,13 +36,11 @@ class PropertyForm(forms.ModelForm):
         label='المقاطعة',
         widget=forms.Select(attrs={'class': 'form-control'})
     )
-
     latitude = forms.FloatField(
         required=False,
         label='خط العرض (Latitude)',
         widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'مثال: 18.0735'})
     )
-
     longitude = forms.FloatField(
         required=False,
         label='خط الطول (Longitude)',
@@ -52,7 +49,8 @@ class PropertyForm(forms.ModelForm):
 
     class Meta:
         model = Property
-        fields = ['title', 'description', 'type', 'purpose', 'price', 'main_location', 'district', 'latitude', 'longitude', 'is_sold']
+        fields = ['title', 'description', 'type', 'purpose', 'price', 'main_location', 'district',
+                  'latitude', 'longitude', 'is_sold', 'main_image', 'video']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'عنوان العقار'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'أدخل وصفًا للعقار...'}),
@@ -60,18 +58,24 @@ class PropertyForm(forms.ModelForm):
             'type': forms.Select(attrs={'class': 'form-control'}),
             'purpose': forms.Select(attrs={'class': 'form-control'}),
             'is_sold': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'main_image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'video': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
 class PropertyMediaForm(forms.ModelForm):
     class Meta:
         model = PropertyMedia
-        fields = ['image', 'video']
+        fields = ['image']
         widgets = {
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'video': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
-PropertyMediaFormSet = modelformset_factory(PropertyMedia, form=PropertyMediaForm, extra=3)
+PropertyMediaFormSet = modelformset_factory(
+    PropertyMedia,
+    form=PropertyMediaForm,
+    fields=['image'],
+    extra=3
+)
 
 class CustomUserCreationForm(UserCreationForm):
     name = forms.CharField(label='الاسم الكامل', max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -90,4 +94,3 @@ class CustomUserCreationForm(UserCreationForm):
 class LoginForm(forms.Form):
     identifier = forms.CharField(label="رقم الهاتف أو البريد الإلكتروني", widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label="كلمة المرور")
-

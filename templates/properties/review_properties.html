@@ -44,7 +44,7 @@
 
 <div class="container my-5">
   <h2 class="mb-4 text-center text-primary">🕒 عقارات في انتظار المراجعة</h2>
-
+  <a href="{% url 'home' %}" class="btn btn-outline-secondary">🏠 العودة للصفحة الرئيسية</a>
   {% for property in properties %}
     <div class="property-card">
       <h4 class="text-primary">{{ property.title }}</h4>

@@ -10,6 +10,7 @@ urlpatterns = [
     path('properties/', include('properties.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('we-are/', we_are_view, name='we_are'),
+    path('vehicles/', include('vehicles.urls')),  # روابط السيارات ✅
 ]
 
 # مهم جداً لعرض الصور المخزنة في MEDIA_ROOT

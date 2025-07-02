@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+{% load static %}
+{% load custom_filters %}
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -30,8 +32,7 @@
     }
   </style>
 </head>
-<body class="bg-light">
-
+<body>
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container">
@@ -41,26 +42,33 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link active" href="#">الرئيسية</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'property_list' %}">العقارات</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">الرئيسية</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.path == '/properties/' %}active{% endif %}" href="{% url 'property_list' %}">🏠 العقارات</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.path == '/vehicles/' %}active{% endif %}" href="{% url 'vehicle_list' %}">🚘 السيارات</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'we_are' %}">من نحن</a></li>
         {% if user.is_authenticated %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">لوحة التحكم</a></li>
-        <li class="nav-item">
-          <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button class="nav-link btn btn-link text-white border-0" type="submit" style="text-decoration: none;">تسجيل الخروج</button>
-          </form>
-        </li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">لوحة التحكم</a></li>
+          {% if user.is_staff %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'review_vehicles' %}">🚗 مراجعة السيارات</a></li>
+          {% endif %}
+          {% if user.is_staff %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'review_properties' %}">مراجعة العقارات</a></li>
+          {% endif %}
+          <li class="nav-item">
+            <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button class="nav-link btn btn-link text-white border-0" type="submit" style="text-decoration: none;">تسجيل الخروج</button>
+            </form>
+          </li>
         {% else %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">تسجيل الدخول</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">تسجيل الدخول</a></li>
         {% endif %}
       </ul>
     </div>
   </div>
 </nav>
 
-<!-- Hero Section -->
+<!-- Hero -->
 <header class="hero-section text-center">
   <div class="overlay">
     <div class="container">
@@ -68,53 +76,98 @@
       <p class="lead">احجز عقارك اليوم – الأفضل في البيع والتأجير بين يديك</p>
       <p class="lead">عندك عقار للبيع أو الإيجار؟ تواصل معنا الآن ودعنا نهتم بالباقي</p>
       <a href="{% url 'add_property' %}" class="btn btn-light btn-lg mt-3">إضافة عقار جديد</a>
+      <a href="{% url 'add_vehicle' %}" class="btn btn-light btn-lg mt-3">🚗 إضافة سيارة</a>
     </div>
   </div>
 </header>
 
-<!-- قسم الفلترة -->
+<!-- Filter Form -->
 <section class="container py-4">
   <form method="get" class="row g-3 align-items-end">
+
     <div class="col-md-4 col-12">
-      <label for="city" class="form-label">المدينة</label>
-      <select class="form-select" name="city" id="city" onchange="this.form.submit()">
-        <option value="">اختر المدينة</option>
-        {% for value, label in cities %}
-          <option value="{{ value }}" {% if value == selected_city %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
+      <label class="form-label">نوع العرض</label>
+      <select class="form-select" id="filter_type" name="filter_type" onchange="toggleFilters()">
+        <option value="">اختر</option>
+        <option value="property" {% if filter_type == 'property' %}selected{% endif %}>عقار</option>
+        <option value="vehicle" {% if filter_type == 'vehicle' %}selected{% endif %}>سيارة</option>
       </select>
     </div>
 
-    {% if selected_city == "نواكشوط" %}
-    <div class="col-md-4 col-12">
-      <label for="district" class="form-label">الحي</label>
-      <select class="form-select" name="district" id="district" onchange="this.form.submit()">
-        <option value="">اختر الحي</option>
-        {% for value, label in districts %}
-          <option value="{{ value }}" {% if value == selected_district %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
+    <!-- عقارات -->
+    <div id="property_filters" class="col-12 row" style="display: none;">
+      <div class="col-md-4 col-12">
+        <label class="form-label">المدينة</label>
+        <select class="form-select" name="city" id="city">
+          <option value="">اختر المدينة</option>
+          {% for value, label in cities %}
+            <option value="{{ value }}" {% if selected_city == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-4 col-12" id="district-wrapper" style="display: none;">
+        <label class="form-label">الحي</label>
+        <select class="form-select" name="district" id="district">
+          <option value="">اختر الحي</option>
+          {% for value, label in districts %}
+            <option value="{{ value }}" {% if selected_district == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="form-label">الغرض</label>
+        <select class="form-select" name="purpose">
+          <option value="">اختر الغرض</option>
+          {% for value, label in purposes %}
+            <option value="{{ value }}" {% if selected_purpose == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
     </div>
-    {% endif %}
+
+    <!-- سيارات -->
+    <div id="vehicle_filters" class="col-12 row" style="display: none;">
+      <div class="col-md-4 col-12">
+        <label class="form-label">الشركة</label>
+        <select name="brand" class="form-select" id="id_brand">
+          <option value="">اختر الشركة</option>
+          {% for brand in brands %}
+            <option value="{{ brand.id }}" {% if selected_brand == brand.id|stringformat:"s" %}selected{% endif %}>{{ brand.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="form-label">الطراز</label>
+        <select name="model" class="form-select" id="id_model">
+          <option value="">اختر الطراز</option>
+          {% for model in models %}
+            <option value="{{ model.id }}" {% if selected_model == model.id|stringformat:"s" %}selected{% endif %}>{{ model.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="form-label">سنة الصنع</label>
+        <select name="year" class="form-select">
+          <option value="">اختر السنة</option>
+          {% for y in 2025|get_year_range:1980 %}
+            <option value="{{ y }}" {% if selected_year == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
 
     <div class="col-md-4 col-12">
-      <label for="purpose" class="form-label">الغرض</label>
-      <select class="form-select" name="purpose" id="purpose" onchange="this.form.submit()">
-        <option value="">اختر الغرض</option>
-        {% for value, label in purposes %}
-          <option value="{{ value }}" {% if value == selected_purpose %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="col-md-4 col-12">
-      <button type="submit" class="btn btn-primary">بحث</button>
-      <a href="{% url 'home' %}" class="btn btn-secondary ms-2">إعادة تعيين</a>
+      <button type="submit" class="btn btn-primary w-100">🔍 تصفية</button>
+      <a href="{% url 'home' %}" class="btn btn-secondary w-100 mt-2">إعادة تعيين</a>
     </div>
   </form>
 </section>
 
-<!-- Featured Properties -->
+<!-- Properties -->
 <section class="container py-5">
   <h2 class="mb-4 text-center">عقارات مميزة</h2>
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -128,19 +181,16 @@
           <a href="{% url 'property_detail' property.pk %}" class="btn btn-outline-primary btn-sm">التفاصيل</a>
         </div>
         {% if property.is_sold %}
-        <span class="badge bg-danger ms-3 mb-2">🔴 تم البيع</span>
+          <span class="badge bg-danger ms-3 mb-2">🔴 تم البيع</span>
         {% endif %}
         <div class="card-footer bg-white border-0">
           <div class="row">
             {% for media in property.media.all %}
-            {% if media.image %}
-            <div class="col-6 col-md-4 mb-2">
-              <img src="{{ media.image.url }}"
-                   class="img-fluid rounded shadow-sm"
-                   style="max-height: 200px; object-fit: cover; width: 100%;"
-                   alt="صورة العقار">
-            </div>
-            {% endif %}
+              {% if media.image %}
+              <div class="col-6 col-md-4 mb-2">
+                <img src="{{ media.image.url }}" class="img-fluid rounded shadow-sm" alt="صورة العقار" style="max-height: 200px; object-fit: cover;">
+              </div>
+              {% endif %}
             {% endfor %}
           </div>
         </div>
@@ -149,13 +199,103 @@
     {% endfor %}
   </div>
 </section>
-
+<div class="text-center mt-3">
+  <a href="{% url 'property_list' %}" class="btn btn-outline-secondary">📋 عرض كل العقارات</a>
+</div>
+<!-- Vehicles -->
+<section class="container py-5">
+  <h2 class="mb-4 text-center">🚘 سيارات مميزة</h2>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for car in vehicles %}
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        {% if car.image %}
+        <img src="{{ car.image.url }}" class="card-img-top" alt="صورة السيارة" style="max-height: 200px; object-fit: cover;">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ car.brand.name }} - {{ car.model.name }} ({{ car.year }})</h5>
+          <p class="card-text">
+            الوقود: {{ car.get_fuel_type_display }}<br>
+            الحالة: {{ car.get_condition_display }}<br>
+            السعر: <strong>{{ car.price }} MRU</strong>
+          </p>
+          <a href="{% url 'vehicle_detail' car.pk %}" class="btn btn-outline-primary btn-sm">📄 التفاصيل</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+<div class="text-center mt-3">
+  <a href="{% url 'vehicle_list' %}" class="btn btn-outline-secondary">🚗 عرض كل السيارات</a>
+</div>
 <!-- Footer -->
 <footer class="bg-primary text-white text-center py-3 mt-5">
   <p class="mb-0">&copy; {{ year }} منصة العقارات. جميع الحقوق محفوظة.</p>
 </footer>
 
+<!-- JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function toggleFilters() {
+    const type = document.getElementById('filter_type').value;
+    document.getElementById('property_filters').style.display = type === 'property' ? 'flex' : 'none';
+    document.getElementById('vehicle_filters').style.display = type === 'vehicle' ? 'flex' : 'none';
+  }
+
+  window.onload = function() {
+    toggleFilters();
+
+    // إظهار الحي إذا كانت نواكشوط محددة مسبقًا
+    if (document.getElementById('city')?.value === 'نواكشوط') {
+      document.getElementById('district-wrapper').style.display = 'block';
+    }
+
+    // تحميل الأحياء
+    document.getElementById('city')?.addEventListener('change', function () {
+      const city = this.value;
+      const wrapper = document.getElementById('district-wrapper');
+      const select = document.getElementById('district');
+      if (city === 'نواكشوط') {
+        fetch(`/properties/ajax/get-districts/?city=${encodeURIComponent(city)}`)
+          .then(res => res.json())
+          .then(data => {
+            select.innerHTML = '<option value="">اختر الحي</option>';
+            data.forEach(item => {
+              const opt = document.createElement('option');
+              opt.value = item.value;
+              opt.textContent = item.label;
+              select.appendChild(opt);
+            });
+            wrapper.style.display = 'block';
+          });
+      } else {
+        select.innerHTML = '';
+        wrapper.style.display = 'none';
+      }
+    });
+
+    // تحميل الطرازات
+    document.getElementById('id_brand')?.addEventListener('change', function () {
+      const brandId = this.value;
+      const modelSelect = document.getElementById('id_model');
+      modelSelect.innerHTML = '<option>تحميل...</option>';
+      fetch(`/vehicles/ajax/get-models/?brand_id=${brandId}`)
+        .then(res => res.json())
+        .then(data => {
+          modelSelect.innerHTML = '<option value="">اختر الطراز</option>';
+          data.forEach(model => {
+            const opt = document.createElement('option');
+            opt.value = model.id;
+            opt.text = model.name;
+            modelSelect.appendChild(opt);
+          });
+        })
+        .catch(() => {
+          modelSelect.innerHTML = '<option value="">تعذر التحميل</option>';
+        });
+    });
+  };
+</script>
 </body>
 </html>
-

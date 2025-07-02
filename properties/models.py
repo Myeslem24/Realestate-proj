@@ -83,7 +83,8 @@ class Property(models.Model):
     price = models.DecimalField(max_digits=12, decimal_places=2)
     latitude = models.FloatField(blank=True, null=True, verbose_name="خط العرض (Latitude)")
     longitude = models.FloatField(blank=True, null=True, verbose_name="خط الطول (Longitude)")
-
+    main_image = models.ImageField(upload_to='property_main/', blank=True, null=True)
+    video = models.FileField(upload_to='property_videos/', blank=True, null=True)
     # الجديد
     main_location = models.CharField(max_length=50, choices=MAIN_LOCATIONS)
     district = models.CharField(max_length=50, choices=NAWAKCHOTT_DISTRICTS, blank=True, null=True)
@@ -98,8 +99,7 @@ class Property(models.Model):
 
 class PropertyMedia(models.Model):
     property = models.ForeignKey(Property, related_name='media', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='property_images/', blank=True, null=True)
-    video = models.FileField(upload_to='property_videos/', blank=True, null=True)
+    image = models.ImageField(upload_to='property_images/')  # بدون null و blank
 
     def __str__(self):
-        return f"Media for {self.property.title}"
+        return f"صورة إضافية لعقار {self.property.title}"
