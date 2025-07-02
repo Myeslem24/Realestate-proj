@@ -19,6 +19,13 @@
     .property-card h5 { margin-bottom: 10px; font-weight: bold; }
     .nav-tabs .nav-link { font-weight: bold; }
     .badge-type { font-size: 0.85rem; padding: 0.35em 0.5em; margin-left: 0.5rem; }
+    img.vehicle-img, img.property-img {
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
     @media (max-width: 576px) {
       .d-flex.justify-content-between {
         flex-direction: column;
@@ -45,7 +52,7 @@
     </div>
   </div>
 
-  <!-- ✅ تبويبات المحتوى -->
+  <!-- ✅ التبويبات -->
   <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
     <li class="nav-item"><button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all">📦 الكل</button></li>
     <li class="nav-item"><button class="nav-link" id="properties-tab" data-bs-toggle="tab" data-bs-target="#properties">🏠 العقارات فقط</button></li>
@@ -64,11 +71,10 @@
       {% for property in my_properties %}
         <div class="property-card">
           {% if property.main_image %}
-            <img src="{{ property.main_image.url }}" class="img-fluid rounded mb-3" style="max-height: 200px; object-fit: cover;">
+            <img src="{{ property.main_image.url }}" class="property-img" alt="صورة العقار">
           {% endif %}
           <h5>{{ property.title }} <span class="badge bg-primary badge-type">عقار</span></h5>
           <p><strong>الوصف:</strong> {{ property.description|truncatewords:25 }}</p>
-          
           <p><strong>الموقع:</strong> {{ property.main_location }}{% if property.district %} - {{ property.district }}{% endif %}</p>
           <p><strong>السعر:</strong> {{ property.price }} MRU</p>
           <p>
@@ -85,6 +91,9 @@
 
       {% for car in my_vehicles %}
         <div class="property-card">
+          {% if car.image %}
+            <img src="{{ car.image.url }}" class="vehicle-img" alt="صورة السيارة">
+          {% endif %}
           <h5>{{ car.brand.name }} - {{ car.model.name }} ({{ car.year }}) <span class="badge bg-success badge-type">سيارة</span></h5>
           <p><strong>النوع:</strong> {{ car.get_fuel_type_display }} | <strong>الحالة:</strong> {{ car.get_condition_display }}</p>
           <p><strong>السعر:</strong> {{ car.price }} MRU</p>
@@ -104,47 +113,52 @@
 
     <!-- 🏠 العقارات فقط -->
     <div class="tab-pane fade" id="properties">
-      {% if my_properties %}
-        {% for property in my_properties %}
-          <div class="property-card">
-            <h5>{{ property.title }}</h5>
-            <p><strong>الوصف:</strong> {{ property.description }}</p>
-            <p><strong>الموقع:</strong> {{ property.main_location }}{% if property.district %} - {{ property.district }}{% endif %}</p>
-            <p><strong>السعر:</strong> {{ property.price }} MRU</p>
-            <a href="{% url 'edit_property' property.id %}" class="btn btn-sm btn-outline-primary">✏️ تعديل</a>
-            <a href="{% url 'delete_property' property.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('تأكيد الحذف؟');">🗑️ حذف</a>
-          </div>
-        {% endfor %}
-      {% else %}
+      {% for property in my_properties %}
+        <div class="property-card">
+          {% if property.main_image %}
+            <img src="{{ property.main_image.url }}" class="property-img" alt="صورة العقار">
+          {% endif %}
+          <h5>{{ property.title }}</h5>
+          <p><strong>الوصف:</strong> {{ property.description }}</p>
+          <p><strong>الموقع:</strong> {{ property.main_location }}{% if property.district %} - {{ property.district }}{% endif %}</p>
+          <p><strong>السعر:</strong> {{ property.price }} MRU</p>
+          <a href="{% url 'edit_property' property.id %}" class="btn btn-sm btn-outline-primary">✏️ تعديل</a>
+          <a href="{% url 'delete_property' property.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('تأكيد الحذف؟');">🗑️ حذف</a>
+        </div>
+      {% empty %}
         <div class="alert alert-info text-center">لا توجد عقارات.</div>
-      {% endif %}
+      {% endfor %}
     </div>
 
     <!-- 🚗 السيارات فقط -->
     <div class="tab-pane fade" id="vehicles">
-      {% if my_vehicles %}
-        {% for car in my_vehicles %}
-          <div class="property-card">
-            <h5>{{ car.brand.name }} - {{ car.model.name }} ({{ car.year }})</h5>
-            <p><strong>الوصف:</strong> {{ car.description }}</p>
-            <p><strong>السعر:</strong> {{ car.price }} MRU</p>
-            <a href="{% url 'edit_vehicle' car.pk %}" class="btn btn-sm btn-outline-primary">✏️ تعديل</a>
-            <a href="{% url 'delete_vehicle' car.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('تأكيد الحذف؟');">🗑️ حذف</a>
-          </div>
-        {% endfor %}
-      {% else %}
+      {% for car in my_vehicles %}
+        <div class="property-card">
+          {% if car.image %}
+            <img src="{{ car.image.url }}" class="vehicle-img" alt="صورة السيارة">
+          {% endif %}
+          <h5>{{ car.brand.name }} - {{ car.model.name }} ({{ car.year }})</h5>
+          <p><strong>الوصف:</strong> {{ car.description }}</p>
+          <p><strong>السعر:</strong> {{ car.price }} MRU</p>
+          <a href="{% url 'edit_vehicle' car.pk %}" class="btn btn-sm btn-outline-primary">✏️ تعديل</a>
+          <a href="{% url 'delete_vehicle' car.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('تأكيد الحذف؟');">🗑️ حذف</a>
+        </div>
+      {% empty %}
         <div class="alert alert-info text-center">🚗 لم تقم بإضافة أي سيارة.</div>
-      {% endif %}
+      {% endfor %}
     </div>
 
-    <!-- التبويبات حسب الحالة -->
+    <!-- 🔍 حسب الحالة -->
     {% for status, label in statuses %}
     <div class="tab-pane fade" id="{{ status }}">
       {% with has_content=False %}
         {% for property in my_properties %}
           {% if property.status == status %}
-            {% if has_content %}{% else %}{% with has_content=True %}{% endwith %}{% endif %}
+            {% if not has_content %}{% with has_content=True %}{% endwith %}{% endif %}
             <div class="property-card">
+              {% if property.main_image %}
+                <img src="{{ property.main_image.url }}" class="property-img" alt="صورة العقار">
+              {% endif %}
               <h5>{{ property.title }}</h5>
               <p><strong>الوصف:</strong> {{ property.description }}</p>
               <p><strong>السعر:</strong> {{ property.price }} MRU</p>
@@ -153,11 +167,13 @@
             </div>
           {% endif %}
         {% endfor %}
-
         {% for car in my_vehicles %}
           {% if car.status == status %}
-            {% if has_content %}{% else %}{% with has_content=True %}{% endwith %}{% endif %}
+            {% if not has_content %}{% with has_content=True %}{% endwith %}{% endif %}
             <div class="property-card">
+              {% if car.image %}
+                <img src="{{ car.image.url }}" class="vehicle-img" alt="صورة السيارة">
+              {% endif %}
               <h5>{{ car.brand.name }} - {{ car.model.name }} ({{ car.year }})</h5>
               <p><strong>السعر:</strong> {{ car.price }} MRU</p>
               <a href="{% url 'edit_vehicle' car.pk %}" class="btn btn-sm btn-outline-primary">✏️ تعديل</a>
@@ -165,14 +181,12 @@
             </div>
           {% endif %}
         {% endfor %}
-
         {% if not has_content %}
           <div class="alert alert-secondary text-center">لا يوجد عناصر في هذه الحالة.</div>
         {% endif %}
       {% endwith %}
     </div>
     {% endfor %}
-
   </div>
 </div>
 
