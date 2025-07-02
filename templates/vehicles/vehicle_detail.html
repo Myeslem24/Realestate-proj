@@ -1,124 +1,139 @@
 {% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>{{ vehicle.brand.name }} - {{ vehicle.model.name }}</title>
+  <title>🚘 قائمة السيارات</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
+      background-color: #f1f3f5;
     }
-
-    /* ✅ تنسيق الصورة الرئيسية والفيديو */
-    .vehicle-main-image, .vehicle-main-video {
-      width: 100%;
-      max-height: 350px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-
-    .media-container img,
-    .media-container video {
-      width: 100%;
+    .card-img-top {
       max-height: 200px;
       object-fit: cover;
-      border-radius: 8px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
     }
-
-    .btn-whatsapp {
-      background-color: #25D366;
-      color: white;
+    .vehicle-card {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: 0.3s ease;
     }
-
-    .btn-whatsapp:hover {
-      background-color: #1ebe5d;
+    .vehicle-card:hover {
+      transform: translateY(-5px);
     }
-
-    .btn-call {
-      background-color: #007bff;
-      color: white;
-    }
-
-    .btn-call:hover {
-      background-color: #0056b3;
-    }
-
-    .card h2 {
-      font-weight: bold;
-    }
-
-    @media (max-width: 768px) {
-      .vehicle-main-image, .vehicle-main-video {
-        max-height: 200px;
-      }
-
-      .media-container img,
-      .media-container video {
-        max-height: 150px;
+    @media (max-width: 576px) {
+      .btn, input, select {
+        width: 100% !important;
       }
     }
   </style>
 </head>
 <body>
 
-<div class="container py-4">
-  <a href="{% url 'vehicle_list' %}" class="btn btn-secondary mb-4">⬅️ العودة إلى قائمة السيارات</a>
+<div class="container my-5">
+  <a href="{% url 'home' %}" class="btn btn-secondary mb-4">🏠 العودة للصفحة الرئيسية</a>
+  <h2 class="mb-4 text-center">🚘 السيارات المعروضة</h2>
 
-  <div class="card shadow-sm p-4">
-    <h2 class="text-primary">{{ vehicle.brand.name }} - {{ vehicle.model.name }} ({{ vehicle.year }})</h2>
-
-    <p><strong>الوصف:</strong> {{ vehicle.description }}</p>
-    <p><strong>نوع الوقود:</strong> {{ vehicle.get_fuel_type_display }} | <strong>الحالة:</strong> {{ vehicle.get_condition_display }}</p>
-    <p><strong>الغرض:</strong> {{ vehicle.get_purpose_display }}</p>
-    <p><strong>السعر:</strong> {{ vehicle.price }} MRU</p>
-
-    {% if vehicle.is_sold %}
-      <span class="badge bg-danger">🔴 تم البيع</span>
-    {% endif %}
-
-    <!-- أزرار التواصل -->
-    <div class="my-3 d-flex flex-wrap gap-2">
-      <a href="https://wa.me/222{{ vehicle.owner.phone_number }}" class="btn btn-whatsapp" target="_blank">💬 واتساب</a>
-      <a href="tel:+222{{ vehicle.owner.phone_number }}" class="btn btn-call">📞 اتصال</a>
+  <!-- 🔍 نموذج الفلترة -->
+  <form method="get" class="row g-3 align-items-end mb-5">
+    <div class="col-md-4 col-12">
+      <label class="form-label">الشركة</label>
+      <select name="brand" class="form-select" id="id_brand">
+        <option value="">اختر الشركة</option>
+        {% for brand in brands %}
+          <option value="{{ brand.id }}" {% if selected_brand == brand.id|stringformat:"s" %}selected{% endif %}>{{ brand.name }}</option>
+        {% endfor %}
+      </select>
     </div>
 
-    <!-- ✅ الصورة الرئيسية -->
-    {% if vehicle.image %}
-      <h5>📷 الصورة الرئيسية:</h5>
-      <img src="{{ vehicle.image.url }}" class="vehicle-main-image" alt="صورة السيارة">
-    {% endif %}
-
-    <!-- ✅ الفيديو -->
-    {% if vehicle.video %}
-      <h5>🎥 فيديو:</h5>
-      <video controls class="vehicle-main-video">
-        <source src="{{ vehicle.video.url }}" type="video/mp4">
-        متصفحك لا يدعم تشغيل الفيديو.
-      </video>
-    {% endif %}
-
-    <!-- ✅ صور إضافية -->
-    {% if vehicle.media.all %}
-      <h5>📸 صور إضافية:</h5>
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 media-container">
-        {% for media in vehicle.media.all %}
-          {% if media.image %}
-          <div class="col">
-            <div class="card shadow-sm h-100">
-              <img src="{{ media.image.url }}" class="card-img-top" alt="صورة إضافية">
-            </div>
-          </div>
-          {% endif %}
+    <div class="col-md-4 col-12">
+      <label class="form-label">الطراز</label>
+      <select name="model" class="form-select" id="id_model">
+        <option value="">اختر الطراز</option>
+        {% for model in models %}
+          <option value="{{ model.id }}" {% if selected_model == model.id|stringformat:"s" %}selected{% endif %}>{{ model.name }}</option>
         {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-4 col-12">
+      <label class="form-label">سنة الصنع</label>
+      <select name="year" class="form-select">
+        <option value="">اختر السنة</option>
+        {% for y in 2025|get_year_range:1980 %}
+          <option value="{{ y }}" {% if selected_year == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-4 col-12">
+      <button type="submit" class="btn btn-primary w-100">🔍 تصفية</button>
+      <a href="{% url 'vehicle_list' %}" class="btn btn-secondary w-100 mt-2">إعادة تعيين</a>
+    </div>
+  </form>
+
+  <!-- 🚗 عرض السيارات -->
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for car in vehicles %}
+    <div class="col">
+      <div class="card vehicle-card h-100">
+        {% if car.image %}
+          <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.model.name }}">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ car.brand.name }} - {{ car.model.name }} ({{ car.year }})</h5>
+          <p class="card-text">
+            🛢️ {{ car.get_fuel_type_display }}<br>
+            ⚙️ {{ car.get_condition_display }}<br>
+            💰 {{ car.price }} MRU
+          </p>
+          {% if car.is_sold %}
+            <span class="badge bg-danger mb-2">🔴 تم البيع</span><br>
+          {% endif %}
+          <a href="{% url 'vehicle_detail' car.pk %}" class="btn btn-outline-primary btn-sm">📄 التفاصيل</a>
+        </div>
       </div>
-    {% endif %}
+    </div>
+    {% empty %}
+      <div class="col-12 text-center">
+        <p class="alert alert-info">🚘 لا توجد سيارات تطابق الفلترة.</p>
+      </div>
+    {% endfor %}
   </div>
 </div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#id_brand').on('change', function() {
+      const brandId = $(this).val();
+      if (brandId) {
+        $.ajax({
+          url: "{% url 'get_car_models' %}",
+          data: { brand_id: brandId },
+          dataType: 'json',
+          success: function(data) {
+            let options = '<option value="">اختر الطراز</option>';
+            data.forEach(function(item) {
+              options += `<option value="${item.id}">${item.name}</option>`;
+            });
+            $('#id_model').html(options);
+          }
+        });
+      } else {
+        $('#id_model').html('<option value="">اختر الطراز</option>');
+      }
+    });
+
+    $('#id_brand').trigger('change');
+  });
+</script>
 
 </body>
 </html>
