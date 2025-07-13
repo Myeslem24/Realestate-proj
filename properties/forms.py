@@ -2,6 +2,8 @@ from django import forms
 from django.forms import modelformset_factory
 from .models import Property, PropertyMedia, CustomUser
 from django.contrib.auth.forms import UserCreationForm
+from django.core.validators import FileExtensionValidator
+from .models import PaymentProof
 
 MAIN_LOCATIONS = [
     ('نواكشوط', 'نواكشوط'),
@@ -94,3 +96,16 @@ class CustomUserCreationForm(UserCreationForm):
 class LoginForm(forms.Form):
     identifier = forms.CharField(label="رقم الهاتف أو البريد الإلكتروني", widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label="كلمة المرور")
+class PaymentProofForm(forms.ModelForm):
+    class Meta:
+        model = PaymentProof
+        fields = ['app_used', 'screenshot']
+        labels = {
+            'app_used': 'اختر التطبيق المستخدم',
+            'screenshot': '📸 لقطة الشاشة'
+        }
+        widgets = {
+            'app_used': forms.Select(attrs={'class': 'form-select'}),
+            'screenshot': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+

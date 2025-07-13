@@ -39,6 +39,10 @@ class Vehicle(models.Model):
         ('approved', 'مقبولة'),
         ('rejected', 'مرفوضة'),
     ]
+    PAYMENT_METHODS = [
+        ('fixed', 'مبلغ ثابت'),
+        ('commission', 'عمولة'),
+    ]
 
     brand = models.ForeignKey(CarBrand, on_delete=models.CASCADE, verbose_name="الشركة")
     model = models.ForeignKey(CarModel, on_delete=models.CASCADE, verbose_name="الطراز")
@@ -64,6 +68,12 @@ class Vehicle(models.Model):
         default='pending',
         verbose_name="حالة الطلب"
     )
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PAYMENT_METHODS,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return f"{self.brand.name} {self.model.name} ({self.year})"
@@ -74,3 +84,19 @@ class VehicleMedia(models.Model):
 
     def __str__(self):
         return f"صورة إضافية لـ {self.vehicle}"
+
+class VehiclePaymentProof(models.Model):
+    PAYMENT_CHOICES = [
+        ('bankily', 'بنكيلي'),
+        ('seddad', 'السداد'),
+        ('bimbank', 'بيم بانك'),
+        ('masrefy', 'مصرفي'),
+    ]
+
+    vehicle = models.OneToOneField('Vehicle', on_delete=models.CASCADE, related_name='payment_proof')
+    app_used = models.CharField(max_length=20, choices=PAYMENT_CHOICES)
+    screenshot = models.ImageField(upload_to='vehicles/payment_proofs/')
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"إثبات دفع لـ {self.vehicle} عبر {self.get_app_used_display()}"

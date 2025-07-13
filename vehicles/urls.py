@@ -1,3 +1,4 @@
+from . import views
 from django.urls import path
 from .views import (
     review_vehicles,
@@ -20,4 +21,6 @@ urlpatterns = [
     path('', vehicle_list, name='vehicle_list'),
     path('delete/<int:pk>/', delete_vehicle, name='delete_vehicle'),
     path('<int:pk>/', vehicle_detail, name='vehicle_detail'),
+    path('<int:vehicle_id>/payment-option/', views.choose_vehicle_payment_option, name='choose_vehicle_payment_option'),
+    path('<int:vehicle_id>/payment-instructions/<str:method>/', views.vehicle_payment_instructions, name='vehicle_payment_instructions'),
 ]

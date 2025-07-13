@@ -7,14 +7,22 @@
   <title>إضافة عقار</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <style>
-    body { background-color: #f8f9fa; }
-    .form-section {
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    body {
+      background-color: #f1f3f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    h2, h4 { font-weight: bold; }
+    .form-card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    h2, h4 {
+      font-weight: bold;
+    }
+    label {
+      font-weight: 500;
+    }
     @media (max-width: 576px) {
       .btn, input, select, textarea {
         width: 100% !important;
@@ -25,25 +33,24 @@
 <body>
 
 <div class="container my-5">
-  <a href="{% url 'home' %}" class="btn btn-secondary mb-4">🏠 العودة للصفحة الرئيسية</a>
+  <a href="{% url 'home' %}" class="btn btn-outline-secondary mb-4">🏠 العودة للصفحة الرئيسية</a>
 
   <div class="text-center mb-4">
     <h2>📝 إضافة عقار جديد</h2>
-    <p class="text-muted">يرجى تعبئة الحقول التالية لإضافة عقارك</p>
+    <p class="text-muted">يرجى تعبئة الحقول التالية لإرسال عقارك للمراجعة</p>
   </div>
 
-  <div class="form-section">
+  <div class="form-card">
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
 
-      <!-- 🏡 معلومات العقار -->
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <!-- 🏡 بيانات العقار -->
       <h4 class="mb-3">📋 معلومات العقار</h4>
       <div class="row">
-        <div class="col-12">
-          {{ form.non_field_errors }}
-        </div>
-
-        {# الحقول النصية والاختيارات باستثناء main_image و video #}
         {% for field in form %}
           {% if field.name != 'main_image' and field.name != 'video' %}
             <div class="col-md-6 mb-3">
@@ -60,7 +67,7 @@
       <!-- 📷 صورة الغلاف والفيديو -->
       <hr class="my-4">
       <h4 class="mb-3">📸 الصورة الرئيسية والفيديو</h4>
-      <p class="text-muted mb-4">📌 يمكنك رفع صورة رئيسية وفيديو قصير للعقار.</p>
+      <p class="text-muted mb-4">📌 يمكنك رفع صورة رئيسية وفيديو قصير للعقار</p>
       <div class="row">
         <div class="col-md-6 mb-3">
           <label for="{{ form.main_image.id_for_label }}" class="form-label">{{ form.main_image.label }}</label>
@@ -78,10 +85,10 @@
         </div>
       </div>
 
-      <!-- 🖼️ صور إضافية -->
+      <!-- 🖼️ الصور الإضافية -->
       <hr class="my-4">
       <h4 class="mb-3">🖼️ صور إضافية</h4>
-      <p class="text-muted mb-4">📌 يمكنك رفع حتى 3 صور إضافية.</p>
+      <p class="text-muted mb-4">📌 يمكنك رفع حتى 3 صور إضافية لعرض العقار بشكل أفضل</p>
 
       {{ media_formset.management_form }}
       <div class="row">
@@ -98,7 +105,7 @@
         {% endfor %}
       </div>
 
-      <!-- زر الحفظ -->
+      <!-- الزر -->
       <hr class="my-4">
       <div class="text-end">
         <button type="submit" class="btn btn-primary btn-lg">💾 حفظ العقار</button>

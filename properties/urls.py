@@ -21,5 +21,7 @@ urlpatterns = [
     path('<int:pk>/', views.property_detail, name='property_detail'),
     path('we-are/', we_are_view, name='we_are'),
     path('ajax/get-districts/', views.get_districts, name='get_districts'),
+    path('property/<int:property_id>/payment-option/', views.choose_payment_option, name='choose_payment_option'),
+    path('property/<int:property_id>/payment/<str:method>/', views.payment_instructions, name='payment_instructions'),
 ]
 

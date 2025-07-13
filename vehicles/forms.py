@@ -2,6 +2,8 @@ from django import forms
 from .models import Vehicle
 from django.forms import modelformset_factory
 from .models import Vehicle, VehicleMedia
+from django.core.validators import FileExtensionValidator
+from .models import VehiclePaymentProof
 
 class VehicleForm(forms.ModelForm):
     class Meta:
@@ -33,3 +35,16 @@ VehicleMediaFormSet = modelformset_factory(
         'image': forms.ClearableFileInput(attrs={'class': 'form-control'})
     }
 )
+class VehiclePaymentProofForm(forms.ModelForm):
+    class Meta:
+        model = VehiclePaymentProof
+        fields = ['app_used', 'screenshot']
+        labels = {
+            'app_used': 'التطبيق المستخدم للدفع',
+            'screenshot': 'لقطة شاشة الدفع',
+        }
+        widgets = {
+            'app_used': forms.Select(attrs={'class': 'form-select'}),
+            'screenshot': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+

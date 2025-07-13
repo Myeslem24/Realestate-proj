@@ -44,13 +44,28 @@
 
 <div class="container my-5">
   <h2 class="mb-4 text-center text-primary">🕒 عقارات في انتظار المراجعة</h2>
-  <a href="{% url 'home' %}" class="btn btn-outline-secondary">🏠 العودة للصفحة الرئيسية</a>
+  <a href="{% url 'home' %}" class="btn btn-outline-secondary mb-4">🏠 العودة للصفحة الرئيسية</a>
+
   {% for property in properties %}
     <div class="property-card">
       <h4 class="text-primary">{{ property.title }}</h4>
       <p><strong>الوصف:</strong> {{ property.description }}</p>
       <p>📍 <strong>الموقع:</strong> {{ property.location }}</p>
       <p>💰 <strong>السعر:</strong> {{ property.price }} MRU</p>
+
+      {% if property.payment_method == 'fixed' %}
+        <p>🧾 <strong>طريقة الدفع:</strong> مبلغ ثابت (3000 MRU)</p>
+        {% if property.payment_proof %}
+          <p>📎 <strong>إثبات الدفع:</strong></p>
+          <img src="{{ property.payment_proof.screenshot.url }}" alt="إثبات الدفع" class="img-thumbnail" style="max-width: 250px;">
+          <p>📱 <strong>التطبيق:</strong> {{ property.payment_proof.get_app_used_display }}</p>
+          <p>🕒 <strong>التاريخ:</strong> {{ property.payment_proof.submitted_at|date:"Y-m-d H:i" }}</p>
+        {% else %}
+          <p class="text-danger">⚠️ لا يوجد إثبات دفع.</p>
+        {% endif %}
+      {% elif property.payment_method == 'commission' %}
+        <p>🤝 <strong>طريقة الدفع:</strong> عمولة (5%)</p>
+      {% endif %}
 
       <div class="row mt-3">
         {% for media in property.media.all %}

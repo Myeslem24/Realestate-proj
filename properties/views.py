@@ -15,6 +15,10 @@ from django.contrib.auth import login
 from vehicles.models import Vehicle  # تأكد من الاستيراد
 from vehicles.models import Vehicle, CarBrand, CarModel  # ✅ استيراد بيانات السيا
 from django.http import JsonResponse
+from .forms import PaymentProofForm
+import os  # ✅ هذا السطر المهم
+from django.conf import settings  # ✅ مهم
+from .models import PaymentProof
 
 def home_view(request):
     # طلبات GET
@@ -99,7 +103,6 @@ def property_list(request):
     }
 
     return render(request, 'properties/property_list.html', context)
-# ✅ إصلاح بسيط في add_property (المسافة في الس
 @login_required(login_url='/accounts/login/')
 def add_property(request):
     if request.method == 'POST':
@@ -123,9 +126,13 @@ def add_property(request):
                 messages.warning(request, '📸 يُفضّل رفع 3 صور إضافية لتحسين عرض العقار.')
 
             messages.success(request, '✅ تم إرسال العقار للمراجعة.')
-            return redirect('dashboard')
+
+            # ✅ إعادة التوجيه إلى صفحة اختيار الدفع
+            return redirect('choose_payment_option', property_id=property.id)
+
         else:
             messages.error(request, '⚠️ يرجى تصحيح الأخطاء أدناه.')
+
     else:
         form = PropertyForm()
         media_formset = PropertyMediaFormSet(queryset=PropertyMedia.objects.none())
@@ -138,7 +145,6 @@ def add_property(request):
 def review_properties(request):
     pending_properties = Property.objects.filter(status='pending')
     return render(request, 'properties/review_properties.html', {'properties': pending_properties})
-
 
 @staff_member_required
 def approve_property(request, pk):
@@ -286,3 +292,59 @@ def get_districts(request):
             for value, label in Property.NAWAKCHOTT_DISTRICTS
         ], safe=False)
     return JsonResponse([], safe=False)
+@login_required
+def choose_payment_option(request, property_id):
+    property = get_object_or_404(Property, id=property_id, owner=request.user)
+    
+    if request.method == "POST":
+        option = request.POST.get("payment_option")
+        if option in ['fixed', 'commission']:
+            property.payment_method = option
+            property.save()
+            return redirect('payment_instructions', property_id=property_id, method=option)
+
+    return render(request, 'properties/payment_option.html', {'property': property})
+
+@login_required
+def payment_instructions(request, property_id, method):
+    property_instance = get_object_or_404(Property, id=property_id, owner=request.user)
+    admin_phone = "22238388780"
+
+    if method == 'fixed':
+        if request.method == 'POST':
+            form = PaymentProofForm(request.POST, request.FILES)
+            if form.is_valid():
+                screenshot = form.cleaned_data['screenshot']
+                app_used = form.cleaned_data['app_used']
+
+                # 1. حفظ طريقة الدفع والتطبيق في العقار
+                property_instance.payment_method = 'fixed'
+                property_instance.app_used = app_used
+                property_instance.save()
+
+                # 2. إنشاء أو تحديث إثبات الدفع في قاعدة البيانات
+                PaymentProof.objects.update_or_create(
+                    property=property_instance,
+                    defaults={
+                        'app_used': app_used,
+                        'screenshot': screenshot,
+                    }
+                )
+
+                messages.success(request, "✅ تم إرسال إثبات الدفع بنجاح.")
+                return redirect('dashboard')
+        else:
+            form = PaymentProofForm()
+    else:
+        if request.method == 'POST':
+            property_instance.payment_method = 'commission'
+            property_instance.save()
+            return redirect('dashboard')
+        form = None
+
+    return render(request, 'properties/payment_instructions.html', {
+        'property': property_instance,
+        'method': method,
+        'admin_phone': admin_phone,
+        'form': form
+    })
