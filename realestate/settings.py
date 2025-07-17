@@ -34,7 +34,6 @@ ALLOWED_HOSTS = os.environ.get(
 print(f"DEBUG: {DEBUG}")
 print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,9 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',                    # ✅ لازم تضيفها هنا
+    'cloudinary_storage',           # ✅ ولازم تضيفها هنا أيضًا
     'properties',
     'widget_tweaks',
-    'vehicles',  # ✅ أضفه هنا
+    'vehicles',
 ]
 
 MIDDLEWARE = [
@@ -57,8 +58,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # مباشرة بعد SecurityMiddleware
-    'cloudinary',
-    'cloudinary_storage',
 ]
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
@@ -155,6 +154,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800
 LOGIN_REDIRECT_URL = '/properties/dashboard/'
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'ddzunbvsf',
