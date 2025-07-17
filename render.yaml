@@ -9,4 +9,7 @@ services:
         value: "False"
       - key: ALLOWED_HOSTS
         value: "realestate-proj.onrender.com,127.0.0.1,localhost"
+envVars:
+  - key: CLOUDINARY_API_SECRET
+    value: EKhNF2vR2DBl7xA2gVg0JfxxFnM
 

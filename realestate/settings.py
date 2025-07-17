@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _  # أضفه في الأعلى
+import cloudinary
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -56,6 +57,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # مباشرة بعد SecurityMiddleware
+    'cloudinary',
+    'cloudinary_storage',
 ]
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale'),
@@ -135,6 +138,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -153,3 +157,8 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800
 LOGIN_REDIRECT_URL = '/properties/dashboard/'
 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'ddzunbvsf',
+    'API_KEY': '736841432476947',
+    'API_SECRET':os.environ.get('CLOUDINARY_API_SECRET')  # 🔐 سيتم جلبها من متغيرات البيئة
+}

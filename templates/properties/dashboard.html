@@ -10,30 +10,49 @@
     body { background-color: #f8f9fa; }
     .property-card {
       border: 1px solid #dee2e6;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 15px;
       margin-bottom: 20px;
       background-color: #ffffff;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      overflow-wrap: break-word;
+      word-wrap: break-word;
     }
-    .property-card h5 { margin-bottom: 10px; font-weight: bold; }
-    .nav-tabs .nav-link { font-weight: bold; }
-    .badge-type { font-size: 0.85rem; padding: 0.35em 0.5em; margin-left: 0.5rem; }
-    img.vehicle-img, img.property-img {
-      max-height: 200px;
+    .property-card h5 {
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .nav-tabs .nav-link {
+      font-weight: bold;
+    }
+    .badge-type {
+      font-size: 0.85rem;
+      padding: 0.35em 0.5em;
+      margin-left: 0.5rem;
+    }
+    img.vehicle-img,
+    img.property-img {
+      max-height: 180px;
       object-fit: cover;
-      border-radius: 5px;
+      border-radius: 6px;
       margin-bottom: 10px;
       width: 100%;
     }
     @media (max-width: 576px) {
       .d-flex.justify-content-between {
-        flex-direction: column;
+        flex-direction: column !important;
         gap: 1rem;
         align-items: flex-start !important;
       }
       .d-flex.justify-content-between .btn {
         width: 100%;
+      }
+      .property-card {
+        padding: 12px;
+      }
+      .property-card h5 {
+        font-size: 1rem;
       }
     }
   </style>
