@@ -170,66 +170,60 @@
 
 <!-- Properties -->
 <section class="container py-5">
-  <h2 class="mb-4 text-center">عقارات مميزة</h2>
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  <h2 class="text-center mb-4">🏡 عقارات مميزة</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
     {% for property in properties %}
     <div class="col">
       <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">{{ property.title }}</h5>
-          <p class="card-text">{{ property.description|truncatechars:100 }}</p>
-          <p class="card-text"><small>📍 {{ property.location }} | 💰 {{ property.price }} MRU</small></p>
-          <a href="{% url 'property_detail' property.pk %}" class="btn btn-outline-primary btn-sm">التفاصيل</a>
-        </div>
-        {% if property.is_sold %}
-          <span class="badge bg-danger ms-3 mb-2">🔴 تم البيع</span>
-        {% endif %}
-        <div class="card-footer bg-white border-0">
-          <div class="row">
-            {% for media in property.media.all %}
-              {% if media.image %}
-              <div class="col-6 col-md-4 mb-2">
-                <img src="{{ media.image.url }}" class="img-fluid rounded shadow-sm" alt="صورة العقار" style="max-height: 200px; object-fit: cover;">
-              </div>
-              {% endif %}
-            {% endfor %}
-          </div>
+        {% with main_image=property.media.first %}
+          {% if main_image and main_image.image %}
+            <img src="{{ main_image.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="صورة العقار">
+          {% else %}
+            <img src="{% static 'images/no-image.png' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="لا توجد صورة">
+          {% endif %}
+        {% endwith %}
+        <div class="card-body p-3">
+          <h5 class="card-title">{{ property.title|truncatechars:35 }}</h5>
+          <p class="card-text small">{{ property.description|truncatechars:80 }}</p>
+          <p class="card-text text-muted small">📍 {{ property.main_location }} | 💰 {{ property.price }} MRU</p>
+          <a href="{% url 'property_detail' property.pk %}" class="btn btn-sm btn-outline-primary">📄 التفاصيل</a>
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
+  <div class="text-center mt-4">
+    <a href="{% url 'property_list' %}" class="btn btn-outline-secondary">📋 عرض كل العقارات</a>
+  </div>
 </section>
-<div class="text-center mt-3">
-  <a href="{% url 'property_list' %}" class="btn btn-outline-secondary">📋 عرض كل العقارات</a>
-</div>
 <!-- Vehicles -->
 <section class="container py-5">
-  <h2 class="mb-4 text-center">🚘 سيارات مميزة</h2>
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  <h2 class="text-center mb-4">🚘 سيارات مميزة</h2>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
     {% for car in vehicles %}
     <div class="col">
       <div class="card h-100 shadow-sm">
         {% if car.image %}
-        <img src="{{ car.image.url }}" class="card-img-top" alt="صورة السيارة" style="max-height: 200px; object-fit: cover;">
+          <img src="{{ car.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="صورة السيارة">
+        {% else %}
+          <img src="{% static 'images/no-image.png' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="لا توجد صورة">
         {% endif %}
-        <div class="card-body">
-          <h5 class="card-title">{{ car.brand.name }} - {{ car.model.name }} ({{ car.year }})</h5>
-          <p class="card-text">
-            الوقود: {{ car.get_fuel_type_display }}<br>
-            الحالة: {{ car.get_condition_display }}<br>
-            السعر: <strong>{{ car.price }} MRU</strong>
+        <div class="card-body p-3">
+          <h5 class="card-title">{{ car.brand.name }} - {{ car.model.name }}</h5>
+          <p class="card-text small">
+            🛢️ {{ car.get_fuel_type_display }} | 📆 {{ car.year }}<br>
+            💰 <strong>{{ car.price }} MRU</strong>
           </p>
-          <a href="{% url 'vehicle_detail' car.pk %}" class="btn btn-outline-primary btn-sm">📄 التفاصيل</a>
+          <a href="{% url 'vehicle_detail' car.pk %}" class="btn btn-sm btn-outline-primary">📄 التفاصيل</a>
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
+  <div class="text-center mt-4">
+    <a href="{% url 'vehicle_list' %}" class="btn btn-outline-secondary">🚗 عرض كل السيارات</a>
+  </div>
 </section>
-<div class="text-center mt-3">
-  <a href="{% url 'vehicle_list' %}" class="btn btn-outline-secondary">🚗 عرض كل السيارات</a>
-</div>
 <!-- Footer -->
 <footer class="bg-primary text-white text-center py-3 mt-5">
   <p class="mb-0">&copy; {{ year }} منصة العقارات. جميع الحقوق محفوظة.</p>
