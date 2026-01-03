@@ -1,4 +1,5 @@
 from django import template
+from cloudinary.utils import cloudinary_url
 
 register = template.Library()
 
@@ -12,3 +13,10 @@ def get_year_range(end, start):
         return list(range(int(start), int(end) + 1))[::-1]
     except:
         return []
+
+@register.filter
+def cloudinary_url_safe(cloudinary_field):
+    if hasattr(cloudinary_field, 'public_id'):
+        url, _ = cloudinary_url(cloudinary_field.public_id, secure=True)
+        return url
+    return ''

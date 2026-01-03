@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from cloudinary.models import CloudinaryField
 
 # مدير المستخدمين
 class CustomUserManager(BaseUserManager):
@@ -88,7 +89,7 @@ class Property(models.Model):
     price = models.DecimalField(max_digits=12, decimal_places=2)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
-    main_image = models.ImageField(upload_to='property_main/', blank=True, null=True)
+    main_image= CloudinaryField(null=True, blank=True)
     video = models.FileField(upload_to='property_videos/', blank=True, null=True)
     main_location = models.CharField(max_length=50, choices=MAIN_LOCATIONS)
     district = models.CharField(max_length=50, choices=NAWAKCHOTT_DISTRICTS, blank=True, null=True)
@@ -103,7 +104,7 @@ class Property(models.Model):
 
 class PropertyMedia(models.Model):
     property = models.ForeignKey(Property, related_name='media', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='property_images/')  # بدون null و blank
+    image = CloudinaryField('image')
 
     def __str__(self):
         return f"صورة إضافية لعقار {self.property.title}"
@@ -117,9 +118,8 @@ class PaymentProof(models.Model):
 
     property = models.OneToOneField(Property, on_delete=models.CASCADE, related_name='payment_proof')
     app_used = models.CharField(max_length=20, choices=PAYMENT_APPS)
-    screenshot = models.ImageField(upload_to='payment_screenshots/')
+    screenshot = CloudinaryField('image')
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"إثبات دفع لـ {self.property.title} عبر {self.get_app_used_display()}"
-

@@ -32,8 +32,8 @@ def home_view(request):
     year = request.GET.get('year')
     filter_type = request.GET.get('filter_type')
 
-    properties = Property.objects.filter(status='approved')
-    vehicles = Vehicle.objects.filter(status='approved')
+    properties = Property.objects.filter(status='approved').prefetch_related('media')[:4]
+    vehicles = Vehicle.objects.filter(status='approved')[:4]
 
     if filter_type == 'property':
         if city:
@@ -43,6 +43,7 @@ def home_view(request):
         if purpose:
             properties = properties.filter(purpose=purpose)
         vehicles = Vehicle.objects.none()
+        properties = properties.prefetch_related('media')[:4]  # ✅ هنا
 
     elif filter_type == 'vehicle':
         if brand_id:
@@ -52,6 +53,11 @@ def home_view(request):
         if year:
             vehicles = vehicles.filter(year=year)
         properties = Property.objects.none()
+        vehicles = vehicles[:4]  # 👈 إن أردت تحديد العدد
+
+    else:
+        properties = properties.prefetch_related('media')[:4]  # ✅
+
 
     context = {
         'properties': properties[:4],

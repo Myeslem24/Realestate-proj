@@ -1,6 +1,6 @@
 {% load static %}
-<!DOCTYPE html>
 {% load custom_filters %}
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -72,31 +72,32 @@
     </div>
   </form>
 
-  <!-- عرض السيارات -->
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    {% for car in vehicles %}
-      <div class="col">
-        <div class="card vehicle-card h-100">
-          {% if car.image %}
-            <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.model.name }}">
-          {% endif %}
-          <div class="card-body">
-            <h5 class="card-title">{{ car.brand.name }} - {{ car.model.name }} ({{ car.year }})</h5>
-            <p class="card-text">
-              الوقود: {{ car.get_fuel_type_display }}<br>
-              الحالة: {{ car.get_condition_display }}<br>
-              السعر: <strong>{{ car.price }} MRU</strong>
-            </p>
-            <a href="{% url 'vehicle_detail' car.pk %}" class="btn btn-outline-primary btn-sm">📄 التفاصيل</a>
-          </div>
+<!-- عرض السيارات -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  {% for car in vehicles %}
+    <div class="col">
+      <div class="card vehicle-card h-100">
+        {% if car.image %}
+          <img src="{{ car.image }}" class="card-img-top" alt="{{ car.model.name }}">
+        {% else %}
+          <img src="{% static 'images/no-image.png' %}" class="card-img-top" alt="لا توجد صورة">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ car.brand.name }} - {{ car.model.name }} ({{ car.year }})</h5>
+          <p class="card-text">
+            الوقود: {{ car.get_fuel_type_display }}<br>
+            الحالة: {{ car.get_condition_display }}<br>
+            السعر: <strong>{{ car.price }} MRU</strong>
+          </p>
+          <a href="{% url 'vehicle_detail' car.pk %}" class="btn btn-outline-primary btn-sm">📄 التفاصيل</a>
         </div>
       </div>
-    {% empty %}
-      <div class="col-12 text-center">
-        <p class="alert alert-info">🚫 لا توجد سيارات تطابق الفلترة.</p>
-      </div>
-    {% endfor %}
-  </div>
+    </div>
+  {% empty %}
+    <div class="col-12 text-center">
+      <p class="alert alert-info">🚫 لا توجد سيارات تطابق الفلترة.</p>
+    </div>
+  {% endfor %}
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

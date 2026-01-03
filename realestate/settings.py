@@ -32,7 +32,7 @@ DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = os.environ.get(
     "ALLOWED_HOSTS",
-    "realestate-proj.onrender.com,127.0.0.1,localhost"
+    "realestate-proj.onrender.com"
 ).split(",")
 print(f"DEBUG: {DEBUG}")
 print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
@@ -165,3 +165,9 @@ CLOUDINARY_STORAGE = {
     'API_KEY': '736841432476947',
     'API_SECRET':os.environ.get('CLOUDINARY_API_SECRET')  # 🔐 سيتم جلبها من متغيرات البيئة
 }
+cloudinary.config(
+    cloud_name='ddzunbvsf',
+    api_key='736841432476947',
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+)
+

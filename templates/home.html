@@ -175,13 +175,24 @@
     {% for property in properties %}
     <div class="col">
       <div class="card h-100 shadow-sm">
-        {% with main_image=property.media.first %}
-          {% if main_image and main_image.image %}
-            <img src="{{ main_image.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="صورة العقار">
-          {% else %}
-            <img src="{% static 'images/no-image.png' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="لا توجد صورة">
-          {% endif %}
-        {% endwith %}
+    {% with main_image=property.media.first %}
+      {% if main_image and main_image.image %}
+        <img src="{{ main_image.image.url }}"
+             class="card-img-top"
+             style="height:200px; object-fit:cover;"
+             alt="صورة العقار">
+    {% elif property.image_url %}
+        <img src="{{ property.image_url }}"
+             class="card-img-top"
+             style="height:200px; object-fit:cover;"
+             alt="صورة العقار">
+     {% else %}
+        <img src="{% static 'images/no-image.png' %}"
+             class="card-img-top"
+             style="height:200px; object-fit:cover;"
+             alt="لا توجد صورة">
+      {% endif %}
+    {% endwith %}
         <div class="card-body p-3">
           <h5 class="card-title">{{ property.title|truncatechars:35 }}</h5>
           <p class="card-text small">{{ property.description|truncatechars:80 }}</p>
@@ -204,10 +215,21 @@
     <div class="col">
       <div class="card h-100 shadow-sm">
         {% if car.image %}
-          <img src="{{ car.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="صورة السيارة">
-        {% else %}
-          <img src="{% static 'images/no-image.png' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="لا توجد صورة">
-        {% endif %}
+         <img src="{{ car.image.url }}"
+              class="card-img-top"
+              style="height:200px; object-fit:cover;"
+              alt="صورة السيارة">
+         {% elif car.image_url %}
+          <img src="{{ car.image_url }}"
+               class="card-img-top"
+               style="height:200px; object-fit:cover;"
+               alt="صورة السيارة">
+          {% else %}
+           <img src="{% static 'images/no-image.png' %}"
+                class="card-img-top"
+                style="height:200px; object-fit:cover;"
+                alt="لا توجد صورة">
+         {% endif %}
         <div class="card-body p-3">
           <h5 class="card-title">{{ car.brand.name }} - {{ car.model.name }}</h5>
           <p class="card-text small">

@@ -2,6 +2,7 @@ from django.db import models
 from properties.models import CustomUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
+from cloudinary.models import CloudinaryField
 
 # الشركة
 class CarBrand(models.Model):
@@ -53,7 +54,7 @@ class Vehicle(models.Model):
         ],
         verbose_name="سنة الصنع"
     )
-    image = models.ImageField(upload_to='vehicles/images/', verbose_name="صورة", null=True, blank=True)
+    image = CloudinaryField(null=True, blank=True)
     video = models.FileField(upload_to='vehicles/videos/', verbose_name="فيديو", null=True, blank=True)
     description = models.TextField(verbose_name="الوصف", null=True, blank=True)
     fuel_type = models.CharField(max_length=10, choices=FUEL_TYPES, verbose_name="نوع الوقود")
@@ -80,7 +81,7 @@ class Vehicle(models.Model):
 
 class VehicleMedia(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='media')
-    image = models.ImageField(upload_to='vehicles/extra_images/', null=True, blank=True)
+    image = CloudinaryField('image', null=True, blank=True)
 
     def __str__(self):
         return f"صورة إضافية لـ {self.vehicle}"
@@ -95,7 +96,7 @@ class VehiclePaymentProof(models.Model):
 
     vehicle = models.OneToOneField('Vehicle', on_delete=models.CASCADE, related_name='payment_proof')
     app_used = models.CharField(max_length=20, choices=PAYMENT_CHOICES)
-    screenshot = models.ImageField(upload_to='vehicles/payment_proofs/')
+    screenshot = CloudinaryField('image')
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

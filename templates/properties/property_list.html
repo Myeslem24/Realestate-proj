@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -74,7 +75,7 @@
     <div class="col">
       <div class="card property-card h-100">
         {% if property.main_image %}
-          <img src="{{ property.main_image.url }}" class="card-img-top" alt="صورة العقار">
+          <img src="{{ main_image.image|cloudinary_url_safe }}" class="card-img-top" alt="صورة العقار">
         {% endif %}
         <div class="card-body">
           <h5 class="card-title">{{ property.title }}</h5>
