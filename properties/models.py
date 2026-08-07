@@ -16,7 +16,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_admin', True)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(phone_number, email, password, **extra_fields)
+        return self.create_user(phone_number=phone_number, password=password, **extra_fields)
 
 # نموذج المستخدم
 class CustomUser(AbstractBaseUser, PermissionsMixin):
