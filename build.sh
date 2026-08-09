@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -o errexit
+
 pip install -r requirements.txt
 python manage.py collectstatic --noinput
-CLOUDINARY_API_SECRET=EKhNF2vR2DBl7xA2gVg0JfxxFnM
+python manage.py migrate

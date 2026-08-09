@@ -6,7 +6,6 @@
   <title>{{ property.title }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     body {
       background-color: #f8f9fa;
@@ -31,6 +30,8 @@
 
     #map {
       height: 350px;
+      width: 100%;
+      border: 0;
       border-radius: 10px;
       margin-top: 20px;
     }
@@ -118,28 +119,25 @@
 
     <!-- ✅ الخريطة -->
     <h5 class="mt-5">🗺️ موقع العقار على الخريطة:</h5>
-    <div id="map">جاري تحميل الخريطة...</div>
+    {% if property.latitude and property.longitude %}
+      {% with lat=property.latitude|stringformat:"f" lng=property.longitude|stringformat:"f" %}
+      <iframe
+        id="map"
+        src="https://maps.google.com/maps?q={{ lat }},{{ lng }}&z=15&output=embed"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen>
+      </iframe>
+      <a href="https://www.google.com/maps/dir/?api=1&destination={{ lat }},{{ lng }}"
+         target="_blank" rel="noopener" class="btn btn-success mt-3">
+        🧭 احصل على الاتجاهات إلى العقار
+      </a>
+      {% endwith %}
+    {% else %}
+      <p class="text-muted">📍 لم يتم تحديد موقع هذا العقار على الخريطة.</p>
+    {% endif %}
   </div>
 </div>
-
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  const lat = {{ property.latitude|default:"0" }};
-  const lng = {{ property.longitude|default:"0" }};
-
-  if (lat !== 0 && lng !== 0) {
-    const map = L.map('map').setView([lat, lng], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-    L.marker([lat, lng]).addTo(map)
-      .bindPopup('📍 موقع العقار')
-      .openPopup();
-  } else {
-    document.getElementById('map').innerHTML = "📍 لم يتم تحديد موقع هذا العقار.";
-  }
-</script>
 
 </body>
 </html>

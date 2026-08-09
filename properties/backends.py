@@ -5,15 +5,21 @@ User = get_user_model()
 
 class PhoneEmailBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
+        identifier = username or kwargs.get('phone_number')
+        if not identifier or not password:
+            return None
+
         user = None
-        try:
-            # جرب البحث بالبريد
-            user = User.objects.get(email=username)
-        except User.DoesNotExist:
+        if '@' in identifier:
             try:
-                # أو جرب البحث برقم الهاتف
-                user = User.objects.get(phone_number=username)
-            except User.DoesNotExist:
+                user = User.objects.get(email=identifier)
+            except (User.DoesNotExist, User.MultipleObjectsReturned):
+                user = None
+
+        if user is None:
+            try:
+                user = User.objects.get(phone_number=identifier)
+            except (User.DoesNotExist, User.MultipleObjectsReturned):
                 return None
 
         if user.check_password(password) and self.user_can_authenticate(user):

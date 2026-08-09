@@ -24,18 +24,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-kx-r5zux4oe=sy^lwa+)9!4z_59t@g8=jvxuz24!hfd5@fotid'
+# يجب تعريف SECRET_KEY في متغيرات البيئة (.env محلياً أو إعدادات Render في الإنتاج).
+# القيمة الافتراضية هنا تُستخدم فقط للتطوير المحلي.
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-kx-r5zux4oe=sy^lwa+)9!4z_59t@g8=jvxuz24!hfd5@fotid"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = os.environ.get(
     "ALLOWED_HOSTS",
     "realestate-proj.onrender.com"
 ).split(",")
-print(f"DEBUG: {DEBUG}")
-print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -79,6 +82,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',  # ✅
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'properties.context_processors.google_maps',
             ],
         },
     },
@@ -160,14 +164,30 @@ LOGIN_REDIRECT_URL = '/properties/dashboard/'
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
+
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'ddzunbvsf',
-    'API_KEY': '736841432476947',
-    'API_SECRET':os.environ.get('CLOUDINARY_API_SECRET')  # 🔐 سيتم جلبها من متغيرات البيئة
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'ddzunbvsf'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '736841432476947'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),  # 🔐 يُجلب من متغيرات البيئة فقط
 }
 cloudinary.config(
-    cloud_name='ddzunbvsf',
-    api_key='736841432476947',
-    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+    api_key=CLOUDINARY_STORAGE['API_KEY'],
+    api_secret=CLOUDINARY_STORAGE['API_SECRET'],
 )
+
+# Render يضع التطبيق خلف بروكسي TLS، وبدون هذا الإعداد سيعتقد Django أن الطلبات HTTP دائماً
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{host}" for host in ALLOWED_HOSTS if host and host != '*'
+]
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 

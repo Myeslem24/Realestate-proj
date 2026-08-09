@@ -32,8 +32,8 @@ def home_view(request):
     year = request.GET.get('year')
     filter_type = request.GET.get('filter_type')
 
-    properties = Property.objects.filter(status='approved').prefetch_related('media')[:4]
-    vehicles = Vehicle.objects.filter(status='approved')[:4]
+    properties = Property.objects.filter(status='approved').prefetch_related('media')
+    vehicles = Vehicle.objects.filter(status='approved')
 
     if filter_type == 'property':
         if city:
@@ -43,7 +43,6 @@ def home_view(request):
         if purpose:
             properties = properties.filter(purpose=purpose)
         vehicles = Vehicle.objects.none()
-        properties = properties.prefetch_related('media')[:4]  # ✅ هنا
 
     elif filter_type == 'vehicle':
         if brand_id:
@@ -53,11 +52,6 @@ def home_view(request):
         if year:
             vehicles = vehicles.filter(year=year)
         properties = Property.objects.none()
-        vehicles = vehicles[:4]  # 👈 إن أردت تحديد العدد
-
-    else:
-        properties = properties.prefetch_related('media')[:4]  # ✅
-
 
     context = {
         'properties': properties[:4],
@@ -318,7 +312,6 @@ def payment_instructions(request, property_id, method):
                 app_used = form.cleaned_data['app_used']
 
                 prop.payment_method = 'fixed'
-                prop.app_used = app_used
                 prop.save()
 
                 PaymentProof.objects.update_or_create(

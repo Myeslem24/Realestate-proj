@@ -8,8 +8,6 @@ from django.conf import settings
 from .models import Vehicle, CarBrand, CarModel, VehicleMedia, VehiclePaymentProof
 from .forms import VehicleForm, VehicleMediaFormSet, VehiclePaymentProofForm
 
-from properties.models import Property
-
 
 def get_models_by_brand(request):
     brand_id = request.GET.get('brand_id')
@@ -17,25 +15,6 @@ def get_models_by_brand(request):
         models = CarModel.objects.filter(brand_id=brand_id).values('id', 'name')
         return JsonResponse(list(models), safe=False)
     return JsonResponse({'error': 'No brand_id provided'}, status=400)
-
-
-@login_required
-def dashboard(request):
-    my_properties = Property.objects.filter(owner=request.user)
-    my_vehicles = Vehicle.objects.filter(owner=request.user)
-
-    statuses = [
-        ('all', 'الكل'),
-        ('pending', 'قيد المراجعة'),
-        ('approved', 'مقبول'),
-        ('rejected', 'مرفوض'),
-    ]
-
-    return render(request, 'dashboard.html', {
-        'my_properties': my_properties,
-        'my_vehicles': my_vehicles,
-        'statuses': statuses,
-    })
 
 
 @login_required
@@ -96,7 +75,7 @@ def edit_vehicle(request, pk):
     vehicle = get_object_or_404(Vehicle, pk=pk, owner=request.user)
 
     if request.method == 'POST':
-        form = VehicleForm(request.POST, instance=vehicle)
+        form = VehicleForm(request.POST, request.FILES, instance=vehicle)
         if form.is_valid():
             form.save()
             messages.success(request, "✅ تم تعديل السيارة بنجاح.")
