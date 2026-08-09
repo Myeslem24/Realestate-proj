@@ -69,11 +69,17 @@
       <h4 class="mb-3">🗺️ موقع العقار</h4>
       {% if GOOGLE_MAPS_API_KEY %}
         <p class="text-muted mb-2">📌 انقر على الخريطة أو اسحب العلامة لتحديد موقع العقار بدقة (سيتم ملء خطي الطول والعرض تلقائياً).</p>
+        <button type="button" id="use-my-location-btn" class="btn btn-outline-primary btn-sm mb-2">
+          📍 استخدم موقعي الحالي
+        </button>
+        <div id="location-status" class="small text-muted mb-2"></div>
         <div id="location-map" style="height: 350px; border-radius: 10px;"></div>
         <script>
           function initLocationMap() {
             const latInput = document.getElementById('id_latitude');
             const lngInput = document.getElementById('id_longitude');
+            const statusEl = document.getElementById('location-status');
+            const locateBtn = document.getElementById('use-my-location-btn');
 
             const defaultLat = parseFloat(latInput.value) || 18.0735;
             const defaultLng = parseFloat(lngInput.value) || -15.9582;
@@ -94,6 +100,14 @@
               lngInput.value = lng.toFixed(6);
             }
 
+            function goToPosition(lat, lng, zoom) {
+              const pos = { lat, lng };
+              map.setCenter(pos);
+              map.setZoom(zoom);
+              marker.setPosition(pos);
+              setFields(lat, lng);
+            }
+
             marker.addListener('dragend', () => {
               const pos = marker.getPosition();
               setFields(pos.lat(), pos.lng());
@@ -102,6 +116,27 @@
             map.addListener('click', (e) => {
               marker.setPosition(e.latLng);
               setFields(e.latLng.lat(), e.latLng.lng());
+            });
+
+            locateBtn.addEventListener('click', () => {
+              if (!navigator.geolocation) {
+                statusEl.textContent = '⚠️ متصفحك لا يدعم تحديد الموقع الجغرافي.';
+                return;
+              }
+              statusEl.textContent = '📡 جاري تحديد موقعك...';
+              locateBtn.disabled = true;
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  goToPosition(position.coords.latitude, position.coords.longitude, 16);
+                  statusEl.textContent = '✅ تم تحديد موقعك الحالي. يمكنك سحب العلامة لتعديله عند الحاجة.';
+                  locateBtn.disabled = false;
+                },
+                (error) => {
+                  statusEl.textContent = '⚠️ تعذّر تحديد موقعك (' + error.message + '). يمكنك النقر على الخريطة يدوياً.';
+                  locateBtn.disabled = false;
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+              );
             });
           }
         </script>
